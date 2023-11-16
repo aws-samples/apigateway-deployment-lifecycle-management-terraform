@@ -1,0 +1,5 @@
+pytest==7.4.2
+tftest==1.8.5
+boto3==1.28.63
+checkov
+pre-commit==3.5.0

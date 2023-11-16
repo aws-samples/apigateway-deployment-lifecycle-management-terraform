@@ -1,0 +1,119 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.2.0
+    hooks:
+      # Git style
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-vcs-permalinks
+      - id: forbid-new-submodules
+      # - id: no-commit-to-branch
+
+      # Common errors
+      - id: end-of-file-fixer
+        exclude: ^(Documentation/.*|.*.drawio)$
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: ^(Documentation/.*|.*.drawio)$
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        exclude: ^(Bootstrap/.*.yaml|Code/Bootstrap/.*.yml)$
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+
+      # Cross platform
+      - id: check-case-conflict
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+      # Security
+      - id: detect-aws-credentials
+        args: ["--allow-missing-credentials"]
+      - id: detect-private-key
+
+  #For Terraform
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.1
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+        exclude: '^[^/]+$' # Exclude the root directory of the module and apply only to examples. known issue in terraform validate
+        args:
+          - '--hook-config=--retry-once-with-cleanup=true'
+      - id: terraform_docs
+        args:
+          - '--args=--lockfile=false'
+          - --args=--config=.terraform-docs.yml
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
+      - id: terraform_tflint
+        args:
+          - '--args=--only=terraform_deprecated_interpolation'
+          - '--args=--only=terraform_deprecated_index'
+          - '--args=--only=terraform_unused_declarations'
+          - '--args=--only=terraform_comment_syntax'
+          - '--args=--only=terraform_documented_outputs'
+          - '--args=--only=terraform_documented_variables'
+          - '--args=--only=terraform_typed_variables'
+          - '--args=--only=terraform_module_pinned_source'
+          - '--args=--only=terraform_naming_convention'
+          - '--args=--only=terraform_required_version'
+          - '--args=--only=terraform_required_providers'
+          - '--args=--only=terraform_standard_module_structure'
+          - '--args=--only=terraform_workspace_remote'
+        exclude: ^([\w-]+/)*(\.[\w-]+/)
+
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 2.3.150
+    hooks:
+      - id: checkov
+        name: Checkov
+        description: This hook runs checkov.
+        entry: checkov -d . --quiet --config-file .checkov.yaml
+        language: python
+        pass_filenames: false
+        always_run: false
+        files: \.tf$
+        exclude: \.+.terraform\/.*$
+        require_serial: true
+
+  #For Python
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - mccabe==0.6.0
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.15.1
+    hooks:
+      - id: gitlint
+        stages: [commit-msg]
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.1.0
+    hooks:
+      - id: add-trailing-comma
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+        language_version: python3.9
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.4
+    hooks:
+      - id: bandit
+        name: bandit (python)
+        args: [-s, B101]
+  # - repo: https://github.com/pycqa/pydocstyle
+  #   rev: 6.1.1
+  #   hooks:
+  #     - id: pydocstyle
+  #       additional_dependencies:
+  #         - toml
+
+
+
+default_language_version:
+  python: python3.9
+default_stages: [commit, push]
