@@ -73,11 +73,17 @@ you can now run terraform apply and check the `Stage` `example` is poiting to th
 latest deployment and the first or `a` deployment has been removed.
 
 
-## Amazon API Gateway Authorization
+## Security
 
-**The API Gateway examples in this repo do not include usage of API Gateway authorizers for simplicity, but it is recommended to implement authorization in a production API using API Gateway authorizers.** Authorizers allow you to implement authentication and authorization for your API methods, such as via OAuth2, JWT tokens, Lambda authorizers, etc. You can find more information about contrloling and maanging accesss to a REST API in API Gateway in the following link:
-https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html
+**Consult with your security teams to to ensure you meet the required security controls for securing an API Gateway.**
+The API Gateway examples in this repo do not include usage of API Gateway authorizers for simplicity, but it is recommended to add WAF and to implement authorization in a production API using API Gateway authorizers.
+1. [Add a AWS Lambda Authorizer or Authentication/Authorization to Amazon API Gateway.](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-to-api.html)
 
+2. [Add a WAF to the Amazon API Gateway.](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-control-access-aws-waf.html)
+
+3. [Add Access Logging to the Amazon API Gateway.](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html)
+
+   
  
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
