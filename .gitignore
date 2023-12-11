@@ -1,0 +1,15 @@
+go.mod
+go.sum
+*.terraform
+*terraform.tfstate.backup
+*terraform.tfstate
+*terraform.tfstate.lock.info
+*.terraform.lock.hcl
+__pycache__
+.external_modules
+.venv/
+__MACOSX/*
+.DS_Store
+.pre-commit-config.yaml
+.terraform-docs.*
+.checkov.*

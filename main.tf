@@ -1,9 +1,5 @@
 resource "aws_api_gateway_rest_api" "example" {
-  name = "example"
-  lifecycle {
-    create_before_destroy = true
-  }
-
+  name = var.name
 }
 
 resource "aws_api_gateway_resource" "example" {
@@ -13,19 +9,19 @@ resource "aws_api_gateway_resource" "example" {
 }
 
 resource "aws_api_gateway_request_validator" "example" {
-  name                        = "example"
+  name                        = var.name
   rest_api_id                 = aws_api_gateway_rest_api.example.id
   validate_request_body       = true
   validate_request_parameters = true
 }
 
 resource "aws_api_gateway_method" "example" {
-  authorization    = "NONE"
-  http_method      = "PUT"
-  api_key_required = true
-  request_validator_id = aws_api_gateway_request_validator.example.id 
-  resource_id      = aws_api_gateway_resource.example.id
-  rest_api_id      = aws_api_gateway_rest_api.example.id
+  authorization        = "NONE"
+  http_method          = "PUT"
+  api_key_required     = true
+  request_validator_id = aws_api_gateway_request_validator.example.id
+  resource_id          = aws_api_gateway_resource.example.id
+  rest_api_id          = aws_api_gateway_rest_api.example.id
 }
 
 resource "aws_api_gateway_integration" "example" {
@@ -72,7 +68,6 @@ resource "aws_api_gateway_deployment" "example" {
     ]))
   }
 
-  # Unfortunately terraform doesn't support dynamic block for lifecycle block neither usage of variables.
   # In case of removal of API-GW deployments "prevent_destroy" needs to be set to "false".
   lifecycle {
     create_before_destroy = true
@@ -82,22 +77,21 @@ resource "aws_api_gateway_deployment" "example" {
 }
 
 resource "aws_api_gateway_stage" "example" {
-  depends_on = [aws_cloudwatch_log_group.example]
+  # For the purpose of this example the API GW will not be protected by WAF and SSL certificate.
+  # The users is anyway encorauged to protect configure WAF and SSL certificate.
+  # checkov:skip=CKV2_AWS_51: "Ensure AWS API Gateway endpoints uses client certificate authentication"
+  # checkov:skip=CKV2_AWS_29: "Ensure public API gateway are protected by WAF"
+  # depends_on            = [aws_cloudwatch_log_group.example]
   deployment_id         = aws_api_gateway_deployment.example[local.deployment].id
   rest_api_id           = aws_api_gateway_rest_api.example.id
   stage_name            = "example"
-  cache_cluster_enabled = false
+  cache_cluster_enabled = true
   xray_tracing_enabled  = true
-  cache_cluster_size = "0.5"
+  cache_cluster_size    = "0.5"
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.example.arn 
-    format = "$context.identity.sourceIp - $context.identity.caller - $context.identity.user [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"   
+    destination_arn = aws_cloudwatch_log_group.example.arn
+    format          = "$context.identity.sourceIp - $context.identity.caller - $context.identity.user [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
   }
-}
-
-resource "aws_cloudwatch_log_group" "example" {
-  name = var.cloudwatch_log
-  retention_in_days = 365
 }
 
 resource "aws_api_gateway_method_settings" "example" {
@@ -106,9 +100,9 @@ resource "aws_api_gateway_method_settings" "example" {
   method_path = "*/*"
 
   settings {
-    metrics_enabled = true
-    logging_level   = "INFO"
-    caching_enabled = true
+    metrics_enabled      = true
+    logging_level        = "INFO"
+    caching_enabled      = true
     cache_data_encrypted = true
   }
 }

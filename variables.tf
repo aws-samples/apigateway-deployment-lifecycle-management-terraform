@@ -1,3 +1,9 @@
+variable "name" {
+  description = "Name of the project used as prefix"
+  default     = "example"
+  type        = string
+}
+
 variable "deployments" {
   description = "List of deployments, this is used to build the deployment ids"
   default     = ["a"]
@@ -17,7 +23,7 @@ variable "reverse_ids" {
 }
 
 variable "cloudwatch_log" {
-    description = "Provides CloudWatch Log group name"
-    default = "apigateway-deployment-management-log"
-    type = string
+  description = "Provides CloudWatch Log group name"
+  default     = "apigateway-deployment-management-log"
+  type        = string
 }
